@@ -33,7 +33,7 @@ modelo
 #INTERFAZ GRAFICA
 #Se crea interfaz gráfica con streamlit para captura de los datos
 
-
+import streamlit as st
 import pandas as pd
 
 st.title('Estimar anticipadamente cuántas personas que diligencian el formulario terminarán pagando')
