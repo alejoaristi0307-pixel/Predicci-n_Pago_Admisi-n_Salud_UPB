@@ -83,20 +83,21 @@ def preparar_datos():
     # Alinear con las columnas del modelo
     dummies = dummies.reindex(columns=columnas_modelo, fill_value=0).astype(float)
 
-    # Aplicar el MinMaxScaler con las mismas columnas del entrenamiento
-    if hasattr(scaler, "feature_names_in_"):
-        cols = list(scaler.feature_names_in_)
-    elif scaler.n_features_in_ == len(columnas_modelo):
-        cols = columnas_modelo
-    elif scaler.n_features_in_ == 1:
-        cols = ["Edad"]
-    else:
-        st.error(f"No se pudo determinar qué columnas escaló el MinMaxScaler "
-                 f"(espera {scaler.n_features_in_} columnas). Revisa el notebook "
-                 f"de entrenamiento.")
-        st.stop()
+    # Aplicar el MinMaxScaler SOLO si fue entrenado (fit) antes de guardarlo
+    if hasattr(scaler, "data_min_"):
+        n_cols = len(scaler.data_min_)
+        if hasattr(scaler, "feature_names_in_"):
+            cols = list(scaler.feature_names_in_)
+        elif n_cols == len(columnas_modelo):
+            cols = columnas_modelo
+        elif n_cols == 1:
+            cols = ["Edad"]
+        else:
+            st.error(f"No se pudo determinar qué columnas escaló el MinMaxScaler "
+                     f"(espera {n_cols} columnas). Revisa el notebook de entrenamiento.")
+            st.stop()
+        dummies[cols] = scaler.transform(dummies[cols])
 
-    dummies[cols] = scaler.transform(dummies[cols])
     return data, dummies, desconocidas
 
 
